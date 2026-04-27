@@ -201,28 +201,28 @@ public class Maze {
      * @return MazeCell enum of the type of cell it is
      */
     public MazeCell getCellValue(int row, int column) {
-        // DO
+        return grid[row][column];
     }
 
     /**
      * Get the total number of columns in the maze.
      */
     public int getNumCols() {
-        // DO
+        return cols;
     }
 
     /**
      * Get the total number of rows in the maze.
      */
     public int getNumRows() {
-        // DO
+        return rows;
     }
 
     /**
      * Return the starting location of the maze.
      */
     public Point getStart() {
-        // DO
+        return new Point(enterCol, enterRow);
     }
 
     /**
@@ -232,7 +232,7 @@ public class Maze {
      * @return true if the point is an exit
      */
     public boolean isExit(Point location) {
-        // DO
+        return location.equals(new Point(exitCol, exitRow));
     }
 
     /**
@@ -242,22 +242,40 @@ public class Maze {
      * @param value The value of the desired location
      */
     public void setCellValue(int row, int column, MazeCell value) {
-        // DO
+        grid[row][column] = value;
     }
 
     /**
      * Mark a discovered path within the maze.
      * @param path the Path being marked
      */
+    //
+    // Takes a Deque (deck) that contains Point objects called path
+    // The path is represented by a deque of points, where each point
+    // contains an x and y coordinate.
+    // The method is meant to take that path and store it as the path from
+    // the entrance to the exit, while also expressing the coordinates of a
+    // point as locations on the grid. i.e Point(x,y) becomes grid(y, x)
     public void setPath(Deque<Point> path) {
-        // DO
+        for (Point p : path) {
+            grid[p.y][p.x] = MazeCell.PERSON;
+        }
     }
 
     /**
      * Create a String representing the current state of the maze.
      */
+    @Override
     public String toString() {
-        // DO
+        StringBuilder sb = new StringBuilder();
+
+        for (int r = 0; r < rows; r++) { // incrament through rows
+            for (int c = 0; c < cols; c++) { // incrament through columns
+                sb.append(toChar(grid[r][c]));
+            }
+            sb.append("\n"); // new line when each row is finished printing
+        }
+        return sb.toString();
     }
 
     /**
@@ -299,19 +317,43 @@ public class Maze {
         }
         return ret;
     }
+
+    /**
+     * helper method to convert MazeCell enum value to character,
+     * Mainly using so the toString return value is prettier
+     * @param cell The cell were converting to the character
+     * @return char The character we got from converting
+     */
+    public char toChar(MazeCell cell) {
+        switch (cell) {
+            case WALL:
+                ret = 'W';
+                break;
+
+            case ENTER:
+                ret = 'E';
+                break;
+
+            case EXIT:
+                ret = 'O';
+                break;
+
+            case OPEN:
+                ret = ' ';
+                break;
+
+            case PERSON:
+                ret = '*';
+                break;
+
+            default;
+                ret = '?';
+                break;
+        }
+        if (ret == null) {
+            throw new InvalidInitException("Invalid Cell");
+        }
+        return ret;
+
+    }
 }
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
