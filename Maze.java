@@ -1,3 +1,8 @@
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.Deque;
+import java.awt.Point;
+import java.io.File;
 /**
  * Models a simple maze.
  */
@@ -38,14 +43,13 @@ public class Maze {
 // 6. Throws our exception class if anything is wrong (maze is unvalidated)
 
 
-
     /**
      * Create a new maze based upon the file defaultMaze.txt.
-     */public Maze(MazeCell[][] maze) {
+     */public Maze(MazeCell[][] maze) throws InvalidInitException {
         // Complete a maze from a 2d Array of MazeCell objects
         // NOT a copy
         this.rows = maze.length;
-        this.cols = maze[0] length;
+        this.cols = maze[0].length;
         this.grid = new MazeCell[this.rows][this.cols]; // creates our maze structure
         this.enterRow = - 1;
         this.enterCol = - 1;
@@ -78,7 +82,7 @@ public class Maze {
             throw new InvalidInitException("Only 1 entrance and exit allowed");
         }
     }
-    public Maze() {
+    public Maze() throws InvalidInitException, FileNotFoundException {
         this("defaultMaze.txt");
     }
 
@@ -86,7 +90,8 @@ public class Maze {
      * Create a new maze based on input from a file.
      * @param fileName the file that serves as the input
      */
-    public Maze(String fileName) {
+    public Maze(String fileName) throws InvalidInitException,
+                FileNotFoundException {
         Scanner file = new Scanner(new File(fileName));
         this.rows = file.nextInt(); // first # is rows
         this.cols = file.nextInt(); // second # is cols
@@ -122,7 +127,7 @@ public class Maze {
                 char ch = line.charAt(c); // stored character in column
                 MazeCell cell = toCell(ch);
                 // converts character to respective MazeCell enum
-                grid[r][c] = cell; // stores our enum in the array
+                            grid[r][c] = cell; // stores our enum in the array
 
 
                 if (cell == MazeCell.ENTER) {
@@ -145,53 +150,13 @@ public class Maze {
                     this.exitCol = c;
                 }
             }
+            file.close();
         }
         if (this.enterRow == -1 || this.exitRow == -1) {
             throw new InvalidInitException("No entrance or exit found");
         }
     }
 
-    /**
-     * Create a maze object from an already existing
-     * collection of MazeCells.
-     * @param maze The already existing maze
-     */
-    public Maze(MazeCell[][] maze) {
-        // Complete a maze from a 2d Array of MazeCell objects
-        // NOT a copy
-        this.rows = maze.length;
-        this.cols = maze[0].length;
-        this.grid = new MazeCell[this.rows][this.cols]; // creates our maze structure
-        this.enterRow = - 1;
-        this.enterCol = - 1;
-        this.exitRow = - 1;
-        this.exitCol = - 1;
-
-        for (int r = 0; r < this.rows; r++) { //goes through each row
-            for (int c = 0; c < this.cols; c++) { // goes through each col
-                this.grid[r][c] = maze[r][c]; // populates our maze
-                if (maze[r][c] == MazeCell.ENTER) {
-                    if (this.enterRow != - 1) {
-                        throw new InvalidInitException("No more than 1 entrance");
-                    }
-                    this.enterRow = r;
-                    this.enterCol = c;
-                }
-
-                if (maze[r][c] == MazeCell.EXIT) {
-                    if (this.exitRow != - 1) {
-                        throw new InvalidInitException("No more than 1 exit");
-                    }
-                    this.exitRow = r;
-                    this.exitCol = c;
-                }
-            }
-        }
-
-        if(this.enterRow == - 1 || this.exitRow == -1) {
-            throw new InvalidInitException("No entrance or exit found");
-        }
-    }
 
     /**
      * Find the symbol at the specified location in the
@@ -206,7 +171,7 @@ public class Maze {
 
     /**
      * Get the total number of columns in the maze.
-     */
+         */
     public int getNumCols() {
         return cols;
     }
@@ -247,7 +212,7 @@ public class Maze {
 
     /**
      * Mark a discovered path within the maze.
-     * @param path the Path being marked
+         * @param path the Path being marked
      */
     //
     // Takes a Deque (deck) that contains Point objects called path
@@ -268,12 +233,16 @@ public class Maze {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
-        for (int r = 0; r < rows; r++) { // incrament through rows
-            for (int c = 0; c < cols; c++) { // incrament through columns
-                sb.append(toChar(grid[r][c]));
+        try {
+            for (int r = 0; r < rows; r++) { // increment through rows
+                for (int c = 0; c < cols; c++) { // increment through columns
+                    sb.append(toChar(grid[r][c]));
+                }
+                sb.append("\n"); // new line when each row is finished printing
             }
-            sb.append("\n"); // new line when each row is finished printing
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Something went wrong...");
         }
         return sb.toString();
     }
@@ -284,7 +253,7 @@ public class Maze {
      * @param ch The character that is being converted
      * @throws InvalidInitException if character is invalid
      * @return the MazeCell value
-     */
+         */
     private MazeCell toCell (char ch) throws InvalidInitException {
         MazeCell ret = null;
 
@@ -308,9 +277,6 @@ public class Maze {
             case 'P':
                 ret = MazeCell.PERSON;
                 break;
-
-            default;
-                break;
         }
         if (ret == null) {
             throw new InvalidInitException("Invalid Character");
@@ -324,9 +290,12 @@ public class Maze {
      * @param cell The cell were converting to the character
      * @return char The character we got from converting
      */
-    public char toChar(MazeCell cell) {
+    public char toChar(MazeCell cell) throws IllegalArgumentException{
+        if (cell == null) {throw new IllegalArgumentException(
+                    "cells cannot be null");}
+        char ret = '0';
         switch (cell) {
-            case WALL:
+                            case WALL:
                 ret = 'W';
                 break;
 
@@ -346,12 +315,9 @@ public class Maze {
                 ret = '*';
                 break;
 
-            default;
+            default:
                 ret = '?';
                 break;
-        }
-        if (ret == null) {
-            throw new InvalidInitException("Invalid Cell");
         }
         return ret;
 
