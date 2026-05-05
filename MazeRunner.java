@@ -54,7 +54,7 @@ public class MazeRunner{
             if (stackStorage.size() == 0) {
                                 System.out.print("Despite our best efforts, this");
                 System.out.println(" maze appears to be unsolvable.");
-                System.out.println(nodesChecked + " nodes checked");
+                System.out.println(nodesChecked + " nodes checked:");
                 while (debugStack.size() != 0) {
                     System.out.println(debugStack.pop().toString());
                 }
