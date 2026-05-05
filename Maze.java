@@ -5,6 +5,8 @@ import java.awt.Point;
 import java.io.File;
 /**
  * Models a simple maze.
+ * @author Luca Rizzo, Jonathan Seda
+ * @version May, 2026
  */
 public class Maze {
     /** the number of rows in the maze */
@@ -52,7 +54,7 @@ public class Maze {
      * @param maze the given grid of cells
      * @throws InvalidInitException if there is a problem in the maze
      * construction
-     */
+         */
     public Maze(MazeCell[][] maze) throws InvalidInitException {
         // Complete a maze from a 2d Array of MazeCell objects
         // NOT a copy
@@ -77,7 +79,7 @@ public class Maze {
         }
 
         if(this.enterRow == - 1) {
-            throw new InvalidInitException("An entrance is required");
+                        throw new InvalidInitException("An entrance is required");
         }
     }
 
@@ -87,7 +89,7 @@ public class Maze {
      * an issue in construction
      * @throws FileNotFoundException if there is (somehow) no such file
      * with the name "defaultMaze.txt"
-         */
+     */
     public Maze() throws InvalidInitException, FileNotFoundException {
         this("defaultMaze.txt");
     }
@@ -104,7 +106,7 @@ public class Maze {
         Scanner file = new Scanner(new File(fileName));
         this.rows = file.nextInt(); // first # is rows
         this.cols = file.nextInt(); // second # is cols
-        file.nextLine(); // moves to the next line
+            file.nextLine(); // moves to the next line
 
         this.grid = new MazeCell[rows][cols];
         // creates 2d array of type MazeCell of the number of
@@ -113,7 +115,7 @@ public class Maze {
         this.enterRow = - 1;
         this.enterCol = - 1; // Initalize these early to check for
         // exception later
-        
+
 
         for (int r = 0; r < rows; r++) { // goes through each row
             if (!file.hasNextLine()) {
@@ -131,7 +133,7 @@ public class Maze {
                         + "on row " + (r + 1) + " of the maze");
             } // makes sure that the length of the line has the
               // actual number of cols that the input says it
-              // does
+                      // does
 
             for (int c = 0; c < cols; c++) {
                 char ch = line.charAt(c); // stored character in column
@@ -139,7 +141,7 @@ public class Maze {
                 // converts character to respective MazeCell enum
                 grid[r][c] = cell; // stores our enum in the array
 
-                
+
                 if (cell == MazeCell.ENTER) {
                     if(this.enterRow != -1) {
                         throw new InvalidInitException("Only 1 entrance");
@@ -158,11 +160,11 @@ public class Maze {
         }
         file.close();
     }
-
+    
 
     /**
      * Find the symbol at the specified location in the
-         * maze
+     * maze
      * @param row The row of the cell value you want
      * @param column The column of the cell value you want
      * @return The enum of the type of cell it is
@@ -186,11 +188,11 @@ public class Maze {
     /**
      * Get the total number of rows in the maze.
      * @return the number of rows
-     */
+         */
     public int getNumRows() {
         return rows;
     }
-        
+
     /**
      * Return the starting location of the maze.
      * @return an ordered pair (Point) of where the start is
@@ -214,10 +216,10 @@ public class Maze {
     /**
      * Sets a location in the maze to a specified value.
      * @param row The row of the desired location
-     * @param column The column of the desired location
+         * @param column The column of the desired location
      * @param value The intended value of the desired location
      */
-        public void setCellValue(int row, int column, MazeCell value) {
+    public void setCellValue(int row, int column, MazeCell value) {
         grid[row][column] = value;
     }
 
@@ -239,7 +241,7 @@ public class Maze {
             grid[p.y][p.x] = MazeCell.PERSON;
         }
     }
-
+    
     /**
      * Create a String representing the current state of the maze.
      * @return a string-based representation of the maze
@@ -248,7 +250,7 @@ public class Maze {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         try {
-                        for (int r = 0; r < rows; r++) { // increment through rows
+            for (int r = 0; r < rows; r++) { // increment through rows
                 for (int c = 0; c < cols; c++) { // increment through columns
                     sb.append(toChar(grid[r][c]));
                 }
@@ -266,7 +268,7 @@ public class Maze {
      * helper method to convert the characters of our file to their
      * respective MazeCell enum value
      * @param ch The character that is being converted
-     * @throws InvalidInitException if character is invalid
+         * @throws InvalidInitException if character is invalid
      * @return the MazeCell value
      */
     private MazeCell toCell (char ch) {
@@ -276,11 +278,11 @@ public class Maze {
             case 'W':
                 ret = MazeCell.WALL;
                 break;
-                
+
             case 'E':
                 ret = MazeCell.ENTER;
                 break;
-                
+
             case 'X':
                 ret = MazeCell.EXIT;
                 break;
@@ -294,7 +296,7 @@ public class Maze {
                 break;
         }
         return ret;
-    }
+            }
 
     /**
      * helper method to convert MazeCell enum value to character,
@@ -326,7 +328,7 @@ public class Maze {
             case PERSON:
                 ret = '*';
                 break;
-                
+
             default:
                 ret = '?';
                 break;
