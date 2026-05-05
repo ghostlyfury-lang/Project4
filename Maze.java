@@ -208,8 +208,6 @@ public class Maze {
     public boolean isExit(Point location) {
         int x = (int) location.getX();
         int y = (int) location.getY();
-        System.out.println(x + ", " + y + " is a "
-            + getCellValue(y, x).toString());
         return getCellValue(y, x).equals(MazeCell.EXIT);
     }
 
@@ -238,7 +236,6 @@ public class Maze {
         int iterations = path.size();
         for (int i = 0; i < iterations; i++) {
             Point p = path.remove();
-            System.out.println(p.toString());
             grid[p.y][p.x] = MazeCell.PERSON;
         }
     }
