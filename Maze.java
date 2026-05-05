@@ -235,7 +235,10 @@ public class Maze {
     // the entrance to the exit, while also expressing the coordinates of a
     // point as locations on the grid. i.e Point(x,y) becomes grid(y, x)
     public void setPath(Deque<Point> path) {
-        for (Point p : path) {
+        int iterations = path.size();
+        for (int i = 0; i < iterations; i++) {
+            Point p = path.remove();
+            System.out.println(p.toString());
             grid[p.y][p.x] = MazeCell.PERSON;
         }
     }
