@@ -1,49 +1,83 @@
-//Does not compile yet
-//Still working on plenty of things
-//This is just some day one progress
+import java.awt.Point;
+import java.util.LinkedList;
+import java.util.Stack;
+import java.io.FileNotFoundException;
 public class MazeRunner{
     private Maze layout;
     private Point entrance;
-    private Deque<Stack<Point>> stackStorage;
-    private LinkedList<Point> traveled;
-    public MazeRunner(String filename) {
+    private LinkedList<Stack<Point>> stackStorage;
+    private int nodesChecked = 0;
+    public MazeRunner(String filename) throws InvalidInitException,
+                    FileNotFoundException {
         layout = new Maze(filename);
         entrance = layout.getStart();
-        stackStorage = new Deque();
-        travelled = new LinkedList();
+        stackStorage = new LinkedList<Stack<Point>>();
     }
     private boolean travelable(Point p) {
-        return layout.getCellValue(p.Y, p.X) == " ";
+        MazeCell check = layout.getCellValue((int) p.getY(), (int) p.getX());
+        return check.equals(MazeCell.OPEN) || check.equals(MazeCell.EXIT);
     }
-    private Stack<Point> getTravelables(Point p) {
-        Stack newStack = new Stack();
-        Point step = p.clone();
-        step.move(1, 0); //center to east
-        if (travelable(step) && !traveled.contains(step)) {
-            newStack.push(step.clone());
+    @SuppressWarnings("unchecked")
+    private void storeIfPushable(Stack<Point> s, Point p) {
+        if (travelable(p) && !s.contains(p)) {
+            Stack<Point> copy = (Stack<Point>) s.clone();
+            copy.push(p);
+            stackStorage.add(copy);
+            nodesChecked++;
         }
-        step.move(-1, 1); //east to north
-        if (travelable(step) && !traveled.contains(step)) {
-            newStack.push(step.clone());
-        }
-        step.move(-1, -1); //north to west
-        if (travelable(step) && !traveled.contains(step)) {
-            newStack.push(step.clone());
-        }
+    }
+    private void createTravelables(Stack<Point> s) {
+                Point step = s.peek();
+        Point east = (Point) step.clone();
+        Point north = (Point) step.clone();
+        Point west = (Point) step.clone();
+        Point south = (Point) step.clone();
+        east.translate(1, 0);
+        north.translate(0, 1);
+        west.translate(-1, 0);
+        south.translate(0, -1);
+        storeIfPushable(s, east);
+        storeIfPushable(s, north);
+        storeIfPushable(s, west);
+        storeIfPushable(s, south);
     }
 
-    public runMaze() {
+    public void runMaze() {
         boolean foundExit = false;
-        Stack initialPoint = new Stack();
+        Stack<Point> exitPath = new Stack<Point>();
+        Stack<Point> initialPoint = new Stack<Point>();
         initialPoint.push(entrance);
         stackStorage.push(initialPoint);
+        nodesChecked++;
+        Stack<Point> debugStack = new Stack<Point>();
         while (!foundExit) {
             if (stackStorage.size() == 0) {
-                if (travelled.size() == 0) {
-                    System.out.println("Something weird happened...");
-                } else {
-                    System.out.print("Despite our best efforts, this");
-                    System.out.print(" maze appears to be unsolvable.");
+                                System.out.print("Despite our best efforts, this");
+                System.out.println(" maze appears to be unsolvable.");
+                System.out.println(nodesChecked + " nodes checked");
+                while (debugStack.size() != 0) {
+                    System.out.println(debugStack.pop().toString());
                 }
-                System.exit();
-
+                System.exit(1);
+            }
+            Stack<Point> nextStack = stackStorage.remove();
+            debugStack = nextStack;
+            if (layout.isExit(nextStack.peek())) {
+                foundExit = true;
+                exitPath = nextStack;
+            } else {
+                createTravelables(nextStack);
+            }
+        }
+        Stack<Point> reversal = new Stack<Point>();
+        for (int i = 0; i < exitPath.size(); i++) {
+            reversal.push(exitPath.pop());
+        }
+        String path = "";
+        for (int i = 0; i < reversal.size(); i++) {
+            Point p = reversal.pop();
+            path += p.toString();
+            path += "---";
+        }
+    }
+}
