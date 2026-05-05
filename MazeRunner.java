@@ -33,9 +33,9 @@ public class MazeRunner{
         Point west = (Point) step.clone();
         Point south = (Point) step.clone();
         east.translate(1, 0);
-        north.translate(0, 1);
-        west.translate(-1, 0);
-        south.translate(0, -1);
+        north.translate(0, 1); //technically because of the way the
+        west.translate(-1, 0); //grid is set up, south is actually
+        south.translate(0, -1); //north and north is actually south
         storeIfPushable(s, east);
         storeIfPushable(s, north);
         storeIfPushable(s, west);
