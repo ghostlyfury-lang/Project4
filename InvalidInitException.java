@@ -1,6 +1,8 @@
 /**
  * Simple exception class to inform us when the things go wrong during
  * initializition.
+ * @author Luca Rizzo, Jonathan Seda
+ * @version May, 2026
  */
 public class InvalidInitException extends Exception {
 
