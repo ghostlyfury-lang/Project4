@@ -257,7 +257,7 @@ public class Maze {
         } catch (IllegalArgumentException e) {
             System.out.println("Something went wrong within " +
                     "the toString method of class Maze:");
-            System.out.println(e.getmessage());
+            System.out.println(e.getMessage());
         }
         return sb.toString();
     }
