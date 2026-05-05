@@ -12,8 +12,6 @@ public class Maze {
 
     private int enterRow;
     private int enterCol;
-    private int exitRow;
-    private int exitCol;
 
     private MazeCell[][] grid;
 
@@ -43,6 +41,7 @@ public class Maze {
 // 6. Throws our exception class if anything is wrong (maze is unvalidated)
 
 
+
     /**
      * Create a new maze based upon the file defaultMaze.txt.
      */public Maze(MazeCell[][] maze) throws InvalidInitException {
@@ -52,10 +51,7 @@ public class Maze {
         this.cols = maze[0].length;
         this.grid = new MazeCell[this.rows][this.cols]; // creates our maze structure
         this.enterRow = - 1;
-        this.enterCol = - 1;
-        this.exitRow = - 1;
-        this.exitCol = - 1;
-
+        
         for (int r = 0; r < this.rows; r++) { //goes through each row
             for (int c = 0; c < this.cols; c++) { // goes through each col
                 this.grid[r][c] = maze[r][c]; // populates our maze
@@ -66,20 +62,12 @@ public class Maze {
                     this.enterRow = r;
                     this.enterCol = c;
                 }
-
-                if (maze[r][c] == MazeCell.EXIT) {
-                    if (this.exitRow != - 1) {
-                        throw new InvalidInitException("No more than 1 entrance");
-                    }
-                    this.exitRow = r;
-                    this.exitCol = c;
-                }
             }
 
         }
 
-        if(this.enterRow == - 1 || this.exitRow == -1) {
-            throw new InvalidInitException("Only 1 entrance and exit allowed");
+        if(this.enterRow == - 1) {
+            throw new InvalidInitException("An entrance is required");
         }
     }
     public Maze() throws InvalidInitException, FileNotFoundException {
@@ -102,23 +90,23 @@ public class Maze {
         // rows and cols found in scanner
 
         this.enterRow = - 1;
-        this.enterCol = - 1;
-        this.exitRow = - 1;
-        this.exitCol = - 1; // Initalize these early to check for
+        this.enterCol = - 1; // Initalize these early to check for
         // exception later
 
 
         for (int r = 0; r < rows; r++) { // goes through each row
             if (!file.hasNextLine()) {
-                throw new InvalidInitException();
+                throw new InvalidInitException("Not enough rows in file");
             } // makes sure the maze has the actual number of rows
               // that it says it does.
 
             String line = file.nextLine();
-            // makes line reference the next line of input
+                        // makes line reference the next line of input
 
             if(line.length() != cols) {
-                throw new InvalidInitException();
+                throw new InvalidInitException("Not enough columns in file "
+                        + line.length() + " given, " + cols + " needed "
+                        + "on row " + r);
             } // makes sure that the length of the line has the
               // actual number of cols that the input says it
               // does
@@ -127,7 +115,7 @@ public class Maze {
                 char ch = line.charAt(c); // stored character in column
                 MazeCell cell = toCell(ch);
                 // converts character to respective MazeCell enum
-                            grid[r][c] = cell; // stores our enum in the array
+                grid[r][c] = cell; // stores our enum in the array
 
 
                 if (cell == MazeCell.ENTER) {
@@ -136,25 +124,17 @@ public class Maze {
                     }
                         // Checks to make sure that the entrance hasn't
                         // already been found before assigning it. If it
-                        // has throw the error. Same logic for exit.
+                        // has throw the error.
 
                     this.enterRow = r;
-                    this.enterCol = c;
-                }
-
-                if (cell == MazeCell.EXIT) {
-                    if(this.exitRow != -1) {
-                        throw new InvalidInitException("No more than 1 exit");
-                    }
-                    this.exitRow = r;
-                    this.exitCol = c;
+                                        this.enterCol = c;
                 }
             }
-            file.close();
         }
-        if (this.enterRow == -1 || this.exitRow == -1) {
-            throw new InvalidInitException("No entrance or exit found");
+        if (this.enterRow == -1) {
+            throw new InvalidInitException("An entrance is required");
         }
+        file.close();
     }
 
 
@@ -166,12 +146,16 @@ public class Maze {
      * @return MazeCell enum of the type of cell it is
      */
     public MazeCell getCellValue(int row, int column) {
-        return grid[row][column];
+        MazeCell returnable = MazeCell.INVALID;
+        if (0 <= row && row < rows && 0 <= column && column < cols) {
+            returnable = grid[row][column];
+        }
+        return returnable;
     }
 
     /**
      * Get the total number of columns in the maze.
-         */
+     */
     public int getNumCols() {
         return cols;
     }
@@ -197,7 +181,11 @@ public class Maze {
      * @return true if the point is an exit
      */
     public boolean isExit(Point location) {
-        return location.equals(new Point(exitCol, exitRow));
+        int x = (int) location.getX();
+        int y = (int) location.getY();
+        System.out.println(x + ", " + y + " is a "
+                                       + getCellValue(y, x).toString());
+        return getCellValue(y, x).equals(MazeCell.EXIT);
     }
 
     /**
@@ -212,7 +200,7 @@ public class Maze {
 
     /**
      * Mark a discovered path within the maze.
-         * @param path the Path being marked
+     * @param path the Path being marked
      */
     //
     // Takes a Deque (deck) that contains Point objects called path
@@ -222,7 +210,7 @@ public class Maze {
     // the entrance to the exit, while also expressing the coordinates of a
     // point as locations on the grid. i.e Point(x,y) becomes grid(y, x)
     public void setPath(Deque<Point> path) {
-        for (Point p : path) {
+                for (Point p : path) {
             grid[p.y][p.x] = MazeCell.PERSON;
         }
     }
@@ -249,11 +237,11 @@ public class Maze {
 
     /**
      * helper method to convert the characters of our file to their
-     * respective MazeCell enum value
+         * respective MazeCell enum value
      * @param ch The character that is being converted
      * @throws InvalidInitException if character is invalid
      * @return the MazeCell value
-         */
+     */
     private MazeCell toCell (char ch) throws InvalidInitException {
         MazeCell ret = null;
 
@@ -278,7 +266,7 @@ public class Maze {
                 ret = MazeCell.PERSON;
                 break;
         }
-        if (ret == null) {
+                if (ret == null) {
             throw new InvalidInitException("Invalid Character");
         }
         return ret;
@@ -295,7 +283,7 @@ public class Maze {
                     "cells cannot be null");}
         char ret = '0';
         switch (cell) {
-                            case WALL:
+            case WALL:
                 ret = 'W';
                 break;
 
@@ -306,7 +294,7 @@ public class Maze {
             case EXIT:
                 ret = 'O';
                 break;
-
+                
             case OPEN:
                 ret = ' ';
                 break;
